@@ -5,23 +5,23 @@ with open("4-input.txt") as f:
     while f.readline():
         board = []
         for line in range(5):
-            board.append([int(n) for n in f.readline().split()])
-        boards.append(board)
+            board.extend([int(n) for n in f.readline().split()])
+        boards.append([board, [0] * 25])
 
 
 def update(board, call):
     for r in range(5):
         for c in range(5):
-            if board[r][c] == call:
-                board[r][c] = 0
+            if board[0][r * 5 + c] == call:
+                board[1][r * 5 + c] = 1
 
 
 def winning(board):
     for r in range(5):
-        if sum(board[r]) == 0:
+        if sum(board[1][r * 5 : (r + 1) * 5]) == 5:
             return True
     for c in range(5):
-        if sum([row[c] for row in board]) == 0:
+        if sum([board[1][r * 5 + c] for r in range(5)]) == 5:
             return True
     return False
 
@@ -30,7 +30,8 @@ def score(board):
     score = 0
     for r in range(5):
         for c in range(5):
-            score += board[r][c]
+            if board[1][r * 5 + c] == 0:
+                score += board[0][r * 5 + c]
     return score
 
 
@@ -54,11 +55,11 @@ def puzzle2(calls, boards):
         for board in boards:
             update(board, call)
             if winning(board):
-                winners.append((call, board))
+                winners.append((board, call))
             else:
                 losers.append(board)
         boards = losers
-    (call, winner) = winners[-1]
+    (winner, call) = winners[-1]
     print(
         "Puzzle 2: board {} won, score {}, answer {}".format(
             winner, score(winner), call * score(winner)
