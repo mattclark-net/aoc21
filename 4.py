@@ -1,5 +1,3 @@
-from pprint import pp
-
 # parse the input
 with open("4-input.txt") as f:
     calls = [int(n) for n in f.readline().split(",")]
@@ -36,15 +34,14 @@ def score(board):
     return score
 
 
-# puzzle 1
 def puzzle1(calls, boards):
     for call in calls:
-        for b in range(len(boards)):
-            update(boards[b], call)
-            if winning(boards[b]):
+        for board in boards:
+            update(board, call)
+            if winning(board):
                 print(
                     "Puzzle 1: board {} won, score {}, last call {}, answer {}".format(
-                        boards[b], score(boards[b]), call, score(boards[b]) * call
+                        board, score(board), call, score(board) * call
                     )
                 )
                 return
