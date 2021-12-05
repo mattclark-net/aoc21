@@ -9,11 +9,14 @@ with open("4-input.txt") as f:
         boards.append([board, [0] * 25])
 
 
-def update(board, call):
-    for r in range(5):
-        for c in range(5):
-            if board[0][r * 5 + c] == call:
-                board[1][r * 5 + c] = 1
+def updatedboards(boards, call):
+    for board in boards:
+        updatedboard = board.copy()
+        for r in range(5):
+            for c in range(5):
+                if updatedboard[0][r * 5 + c] == call:
+                    updatedboard[1][r * 5 + c] = 1
+        yield updatedboard
 
 
 def winning(board):
@@ -35,38 +38,42 @@ def score(board):
     return score
 
 
-def puzzle1(calls, boards):
-    for call in calls:
-        for board in boards:
-            update(board, call)
-            if winning(board):
-                print(
-                    "Puzzle 1: board {} won, score {}, last call {}, answer {}".format(
-                        board, score(board), call, score(board) * call
-                    )
-                )
-                return
-
-
-def puzzle2(calls, boards):
+def winners_and_losers(boards, call):
     winners = []
+    losers = []
+    for board in updatedboards(boards, call):
+        winners.append(board) if winning(board) else losers.append(board)
+    return winners, losers
+
+
+def puzzle1(boards, calls):
     for call in calls:
-        losers = []
-        for board in boards:
-            update(board, call)
+        for board in updatedboards(boards, call):
             if winning(board):
-                winners.append((board, call))
-            else:
-                losers.append(board)
-        boards = losers
-    (winner, call) = winners[-1]
-    print(
-        "Puzzle 2: board {} won, score {}, answer {}".format(
-            winner, score(winner), call * score(winner)
-        )
+                return board, call
+
+
+def puzzle2(boards, calls):
+    allwinners = []
+    losers = boards.copy()
+    for call in calls:
+        winners, losers = winners_and_losers(losers, call)
+        if winners != []:
+            allwinners.append([winners, call])
+    return allwinners[-1]
+
+
+firstwinner, call = puzzle1(boards, calls)
+print(
+    "Puzzle 1: board {} won, score {}, last call {}, answer {}".format(
+        firstwinner, score(firstwinner), call, score(firstwinner) * call
     )
-    return
+)
 
-
-puzzle1(calls, boards.copy())
-puzzle2(calls, boards.copy())
+lastwinners, call = puzzle2(boards, calls)
+lastwinner = lastwinners[-1]
+print(
+    "Puzzle 2: board {} won, score {}, answer {}".format(
+        lastwinner, score(lastwinner), call * score(lastwinner)
+    )
+)
