@@ -8,17 +8,24 @@ height = len(energy)
 
 def neighbouring(j, i):
     # j, i neighbour list including diagonals
-    c = set([(i - 1, j - 1) for i in range(3) for j in range(3)])
-    c.remove((0, 0))
+    xstart, xend, ystart, yend = (-1, 1, -1, 1)
     if i == 0:
-        c -= set([(n, -1) for n in (-1, 0, 1)])
+        xstart = 0
     elif i == width - 1:
-        c -= set([(n, 1) for n in (-1, 0, 1)])
+        xend = 0
     if j == 0:
-        c -= set([(-1, n) for n in (-1, 0, 1)])
+        ystart = 0
     elif j == height - 1:
-        c -= set([(1, n) for n in (-1, 0, 1)])
-    return set([(j + y, i + x) for (y, x) in c])
+        yend = 0
+    c = set(
+        (
+            (j + y, i + x)
+            for x in range(xstart, xend + 1)
+            for y in range(ystart, yend + 1)
+        )
+    )
+    c.remove((j, i))  # it's a neighbour list so shouldn't include the input position
+    return c
 
 
 def flash_maybe(j, i) -> int:
